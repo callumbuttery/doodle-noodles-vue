@@ -1,7 +1,7 @@
 <template>
   <div class="pimaryCarouselContainer">
     <div class="secondaryCarouselContainer">
-      <v-carousel>
+      <v-carousel class="carousel">
         <v-carousel-item
           v-for="(item, i) in items"
           :key="i"
@@ -46,5 +46,13 @@ export default {
 .secondaryCarouselContainer{
     max-width: 60%;
     margin: 0 auto;
+}
+
+.carousel {
+  border-radius: 25px;
+}
+
+.v-carousel__controls {
+  background-color: transparent;
 }
 </style>
