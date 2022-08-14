@@ -44,6 +44,29 @@ export default {
     padding-left: 40%;
 }
 
+@media only screen and (max-width: 2500px) {
+    .mintButtonContainer {
+        padding-top: 800px;
+        padding-left: 40%;
+    }
+
+    .minterPimraryContainer {
+        height: 1200px;
+    }
+}
+
+@media only screen and (max-width: 2300px) {
+    .mintButtonContainer {
+        padding-top: 500px;
+        padding-left: 30%;
+    }
+
+    .minterPimraryContainer {
+        height: 800px;
+    }
+}
+
+
 @media screen and (max-width: 1600px) {
     .mintButtonContainer {
         padding-top: 250px;
