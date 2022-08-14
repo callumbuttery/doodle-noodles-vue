@@ -7,11 +7,11 @@
                     <v-btn color="red" class="white--text minterButton" id="beginMintingButton" justify="center"
                         @click="displayMinting()">Begin Minting</v-btn>
                     <div id="actualMintingContainer">
-                        <v-combobox dense filled hide-selected outlined solo class="comboBox" :items="items"
-                            placeholder="1 NFT">
+                        <v-combobox dense filled hide-selected outlined solo class="comboBox" id="comboBox"
+                            :items="items" placeholder="1 NFT" item-value="value" item-text="text" @change="storeValue">
                         </v-combobox>
                         <v-row justify="center" align="center">
-                            <v-btn id="actualMintingButton">Mint</v-btn>
+                            <v-btn id="actualMintingButton" @click="mint">Mint</v-btn>
                         </v-row>
                     </div>
                 </v-col>
@@ -28,12 +28,13 @@ export default {
     data() {
         return {
             items: [
-                '1 NFT',
-                '2 NFTs',
-                '3 NFTs',
-                '4 NFTs',
-                '5 NFTs',
+                { text: '1 NFT', value: '1' },
+                { text: '2 NFTs', value: '2' },
+                { text: '3 NFTs', value: '3' },
+                { text: '4 NFTs', value: '4' },
+                { text: '5 NFTs', value: '5' },
             ],
+            selectedValue: 0,
         }
     },
 
@@ -43,6 +44,12 @@ export default {
             document.getElementById('actualMintingContainer').style.display = "block";
             document.getElementById('actualMintingButton').style.display = "block";
 
+        },
+        storeValue(e) {
+            this.selectedValue = e.value;
+        },
+        mint() {
+            this.selectedValue >=1 && this.selectedValue <=5 ? console.log('time to mint')  : console.log('invalid mint amount');
         }
     },
     mounted() {
