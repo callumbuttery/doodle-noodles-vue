@@ -41,7 +41,8 @@
 
 <script>
 import Web3 from "web3";
-//import SmartContract from "../../contracts/SmartContract.sol";
+import { ethers } from "ethers";
+import SmartContract from "../../contracts/SmartContract.sol";
 
 import Alert from "./Alert.vue";
 
@@ -56,7 +57,7 @@ export default {
         { text: "4 NFTs", value: "4" },
         { text: "5 NFTs", value: "5" },
       ],
-      selectedValue: 0,
+      amount: 0,
       alert: false,
       type: "",
       displayMinting: false,
@@ -75,7 +76,7 @@ export default {
           });
           if (networkId == process.env.REACT_APP_NETWORKID) {
             const SmartContractObj = new web3.eth.Contract(
-              //SmartContract.abi,
+              SmartContract.abi,
               process.env.REACT_APP_CONTRACT_ADDRESS
             );
             this.addWallet({
@@ -91,13 +92,13 @@ export default {
               window.location.reload();
             });
           } else {
-            this.showAlert("Change network to ETH mainnet.", 'warning');
+            this.showAlert("Change network to ETH mainnet.", "warning");
           }
         } catch (err) {
-          this.showAlert("Something went wrong.", 'error');
+          this.showAlert("Something went wrong.", "error");
         }
       } else {
-        this.showAlert("Install Metamask.", 'info');
+        this.showAlert("Install Metamask.", "info");
       }
 
       // document.getElementById('beginMintingButton').style.display = "none";
@@ -109,7 +110,7 @@ export default {
     },
     checkValue() {
       this.selectedValue >= 1 && this.selectedValue <= 5
-        ? console.log("time to mint")
+        ? this.mint()
         : console.log("invalid mint amount");
     },
     showAlert(message, type) {
@@ -123,6 +124,83 @@ export default {
     },
     addWallet(object) {
       this.$store.commit("addWallet", object);
+    },
+    async mint() {
+      let web3 = new Web3(window.ethereum);
+
+      var costing = web3.utils.toWei(
+        (this.amount * process.env.REACT_APP_MINT_COST).toString(),
+        "ether"
+      );
+
+      if (process.env.REACT_APP_MINTACTIVE == "true") {
+        console.log("Attempting to mintNoodle");
+        try {
+          gettingNFT(true);
+
+          blockchain.smartContract.methods
+            .mintNoodle(this.amount)
+            .send({
+              from: blockchain.account,
+              value: costing,
+            })
+            .then((recipt) => {
+              console.log(recipt);
+              settingMessage("Successfully minted a Doodle Noodle!!");
+              gettingNFT(false);
+            });
+          dispatch(fetchData(blockchain.account));
+        } catch (e) {
+          console.log("Something went wrong: ", e);
+          settingMessage("An error occured, try minting again!");
+          gettingNFT(false);
+        }
+      } else if (process.env.REACT_APP_PRESALEACTIVE == "true") {
+        console.log("Attempting to mint presale");
+        try {
+          gettingNFT(true);
+
+          const response = await axios.post(
+            `/.netlify/functions/validate`,
+            blockchain.account
+          );
+
+          const verified = response.data.verified;
+          const confirmedHash = response.data.confirmedHash;
+
+          if (verified != false) {
+            const signature = confirmedHash;
+
+            let sig = ethers.utils.splitSignature(signature);
+
+            console.log(sig);
+
+            blockchain.smartContract.methods
+              .presaleMintNoodle(amount, sig.r, sig.s, sig.v)
+              .send({
+                from: blockchain.account,
+                value: costing,
+              })
+              .then((recipt) => {
+                console.log(recipt);
+                settingMessage("Successfully minted a Doodle Noodle!!");
+                gettingNFT(false);
+              });
+            gettingNFT(false);
+            dispatch(fetchData(blockchain.account));
+          } else {
+            gettingNFT(true);
+            settingMessage("Account not whitelisted for presale");
+          }
+        } catch (e) {
+          console.log("Something went wrong: ", e);
+          settingMessage("An error occured, try minting again!");
+          gettingNFT(false);
+        }
+      } else {
+        settingMessage("Presale / Minting not yet active");
+        gettingNFT(false);
+      }
     },
   },
   mounted() {
