@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-alert elevation="13" :type="type">{{$store.state.alertMessage}}</v-alert>
+    <v-alert elevation="13" :type="type" class="alertMessage">{{$store.state.alertMessage}}</v-alert>
   </div>
 </template>
 
@@ -20,3 +20,11 @@ export default {
 }
 
 </script>
+
+<style>
+
+.alertMessage {
+    margin-top: 50px;
+}
+
+</style>
